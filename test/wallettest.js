@@ -27,15 +27,30 @@ contract("Dex", accounts => {
 
   })
 
-  // it("Add tokens to Dex from X account", async function (){
-  //   let dex = await Dex.deployed();
-  //   let token = await Token.deployed();
-  //   await token.approve(dex.address,1000);
-  //   await dex.deposit(100, web3.utils.fromUtf8(token.symbol));
-  //   let balanceOfToken = await dex.balances(accounts[0], web3.utils.fromUtf8(token.symbol));
+  it("Should handle deposits correctly", async function (){
+     let dex = await Dex.deployed();
+     let token = await Token.deployed();
+     await token.approve(dex.address,1000,{from:accounts[0]});
+     await dex.deposit(100, web3.utils.fromUtf8(token.symbol),
+                      {from:accounts[0]});
+     let balance = await dex.balances(accounts[0],
+                                      web3.utils.fromUtf8(token.symbol));
+     assert.equal(balance.toNumber(),100)
+     await console.log("Balance of accout" + balance.toNumber())
+      
+   })
 
-  //   console.log(balanceOfToken);
+   it("Should handle faulty withdraws correctly", async function (){
+    let dex = await Dex.deployed();
+    let token = await Token.deployed();
 
+    await truffleAssert.reverts(dex.withdraw(500, web3.utils.fromUtf8(token.symbol)))
+   })
 
-  // })
+   it("Should handle withdraws correctly", async function (){
+    let dex = await Dex.deployed();
+    let token = await Token.deployed();
+
+    await truffleAssert.passes(dex.withdraw(100, web3.utils.fromUtf8(token.symbol)))
+   })
 });
