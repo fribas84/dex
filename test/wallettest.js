@@ -61,14 +61,14 @@ contract("Dex", accounts => {
 
 
     await truffleAssert.reverts(
-      dex.createLimitOrder(0,web3.utils.fromUtf8(token.symbol),10,1)
+      dex.createLimitOrder(0,web3.utils.fromUtf8(token.symbol),1,10)
     )
     await token.approve(dex.address,10);
 
     await dex.depositEth({value: 100});
 
     await truffleAssert.passes(
-      dex.createLimitOrder(0,web3.utils.fromUtf8(token.symbol),10,1)
+      dex.createLimitOrder(0,web3.utils.fromUtf8(token.symbol),1,10)
     )
 
    })
@@ -78,14 +78,14 @@ contract("Dex", accounts => {
     let token = await Token.deployed();
     
     await truffleAssert.reverts(
-      dex.createLimitOrder(0,web3.utils.fromUtf8(token.symbol),1000000,1)
+      dex.createLimitOrder(0,web3.utils.fromUtf8(token.symbol),1,1000000000)
 
     )
 
     await token.approve(dex.address,10);
     await dex.deposit(10, web3.utils.fromUtf8(token.symbol));
     await truffleAssert.passes(
-      dex.createLimitOrder(1, web3.utils.fromUtf8(token.symbol),5,1)
+      dex.createLimitOrder(1, web3.utils.fromUtf8(token.symbol),1,5)
     )
     
     
@@ -126,9 +126,9 @@ contract("Dex", accounts => {
     await token.approve(dex.address,100);
     await dex.deposit(80, web3.utils.fromUtf8(token.symbol)
                       );
-    await dex.createLimitOrder(1, web3.utils.fromUtf8(token.symbol),1,100);
-    await dex.createLimitOrder(1, web3.utils.fromUtf8(token.symbol),1,200);
-    await dex.createLimitOrder(1, web3.utils.fromUtf8(token.symbol),1,500);
+    await dex.createLimitOrder(1, web3.utils.fromUtf8(token.symbol),1,15);
+    await dex.createLimitOrder(1, web3.utils.fromUtf8(token.symbol),1,30);
+    await dex.createLimitOrder(1, web3.utils.fromUtf8(token.symbol),1,2);
     let orderBook = await dex.getOrderBook(web3.utils.fromUtf8(token.symbol),1);
     console.log(orderBook);
     assert(orderBook.length >0);

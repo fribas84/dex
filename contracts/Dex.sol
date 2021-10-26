@@ -65,6 +65,15 @@ contract Dex is Wallet {
     }
     else if(side == Side.SELL) {
 
+      uint i =  orders.length > 0 ? orders.length - 1 : 0;
+      while(i>0) {
+        if(orders[i].price < orders[i - 1].price){
+          Order memory tempOrder = orders[i - 1];
+          orders[i-1] = orders[1];
+          orders[i]= tempOrder;  
+        }
+      i--;
+      }
 
     }
 
