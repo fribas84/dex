@@ -53,4 +53,95 @@ contract("Dex", accounts => {
 
     await truffleAssert.passes(dex.withdraw(100, web3.utils.fromUtf8(token.symbol)))
    })
+
+   it("The User must have deposited ETH >= buy order value", async function() {
+    let dex = await Dex.deployed();
+    let token = await Token.deployed();    
+    //createLimitOrder(SIDE,TOKEN,price, amount)
+
+
+    await truffleAssert.reverts(
+      dex.createLimitOrder(0,web3.utils.fromUtf8(token.symbol),10,1)
+    )
+    await token.approve(dex.address,10);
+
+    await dex.depositEth({value: 100});
+
+    await truffleAssert.passes(
+      dex.createLimitOrder(0,web3.utils.fromUtf8(token.symbol),10,1)
+    )
+
+   })
+
+   it("The User must have enough tokens such that Token balance >= sell order", async function() {
+    let dex = await Dex.deployed();
+    let token = await Token.deployed();
+    
+    await truffleAssert.reverts(
+      dex.createLimitOrder(0,web3.utils.fromUtf8(token.symbol),1000000,1)
+
+    )
+
+    await token.approve(dex.address,10);
+    await dex.deposit(10, web3.utils.fromUtf8(token.symbol));
+    await truffleAssert.passes(
+      dex.createLimitOrder(1, web3.utils.fromUtf8(token.symbol),5,1)
+    )
+    
+    
+
+   })
+
+   it("The first BUY order ([0]) in by order book should have the highest price", async function() {
+    let dex = await Dex.deployed();
+    let token = await Token.deployed();
+    
+    await token.approve(dex.address,80);
+    await dex.deposit(50, web3.utils.fromUtf8(token.symbol)
+                      );
+    await dex.createLimitOrder(0, web3.utils.fromUtf8(token.symbol),1,20
+                              );
+    await dex.createLimitOrder(0, web3.utils.fromUtf8(token.symbol),1,40
+                              );
+    await dex.createLimitOrder(0, web3.utils.fromUtf8(token.symbol),1,50
+                              );
+    //getOrderBook(TOKEN,SIDE)
+    let orderBook = await dex.getOrderBook(web3.utils.fromUtf8(token.symbol),0);
+    console.log(orderBook);
+    assert(orderBook.length >0);
+    
+    for(let i=0;i<orderBook.length -1;i++){
+
+      assert(
+        orderBook[i] >= orderBook[i+1], "Orderbook is in the wrong order." 
+        )
+
+      } 
+  })
+
+  it("The first SELL order ([0]) in by order book should have the lowest price", async function() {
+    let dex = await Dex.deployed();
+    let token = await Token.deployed();
+    
+    await token.approve(dex.address,100);
+    await dex.deposit(80, web3.utils.fromUtf8(token.symbol)
+                      );
+    await dex.createLimitOrder(1, web3.utils.fromUtf8(token.symbol),1,100);
+    await dex.createLimitOrder(1, web3.utils.fromUtf8(token.symbol),1,200);
+    await dex.createLimitOrder(1, web3.utils.fromUtf8(token.symbol),1,500);
+    let orderBook = await dex.getOrderBook(web3.utils.fromUtf8(token.symbol),1);
+    console.log(orderBook);
+    assert(orderBook.length >0);
+    for(let i=0;i<orderBook.length -1;i++){
+      assert(
+        orderBook[i] <= orderBook[i+1], "Orderbook is in the wrong order." 
+      )
+
+    }
+
+    
+  })
+
+
+
 });
