@@ -7,7 +7,7 @@ const truffleAssert = require('truffle-assertions');
  * Ethereum client
  * See docs: https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript
  */
-contract("Dex", accounts => {
+contract.skip("Dex", accounts => {
   it("Validate if Dex contract is deployed correctly", async function () {
     await Dex.deployed();
     return assert.isTrue(true);
