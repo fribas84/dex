@@ -17,6 +17,7 @@ contract Dex is Wallet {
     bytes32 ticker;
     uint amount;
     uint price;
+    uint filled;
 
   }
 
@@ -42,7 +43,7 @@ contract Dex is Wallet {
     Order[] storage orders = orderBook[ticker][uint(side)];
     //the id must be  unique for all orders, using nextOrderId as a register.
     orders.push(
-      Order(nextOrderId,msg.sender, side,ticker,amount,price)
+      Order(nextOrderId,msg.sender, side,ticker,amount,price,0)
     );
 
     // bubble sort depending in the order type.
@@ -80,6 +81,30 @@ contract Dex is Wallet {
   }
 
   function createMarketOrder(Side side, bytes32 ticker, uint amount) public{
-    
+    //to match order book with oposite of the MO 
+    uint orderBookSide;
+    if(side == Side.BUY){
+      orderBookSide = 1; 
+    }
+    else{
+      orderBookSide = 0;
+    }
+    Order[] storage orders = orderBook[ticker][uint(orderBookSide)];
+
+    uint totalFilled;
+    // search the orders and also validation that the MO is not completed filled
+    for (uint256 i = 0; i < orders.length && totalFilled < amount ; i++) {
+        // how much we can filled from order [i]
+  	    uint leftToFill = amount.sub(totalFilled);
+        uint available = orders[i].amount.sub(orders[i].filled);
+
+        // update totalfilled;
+
+        //execute the trade & shift balances between buyer //seller
+        //verify that the buyer has enough eth to cover
+      
+    }
+
+    //loop thorugh orderbook and remove 100% filled orders
   }
 }
