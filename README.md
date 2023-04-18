@@ -1,5 +1,5 @@
 # Solidity DEX code
-DEX project for Ethereum 201 class form Moralis Academy (AKA Ivan on Tech Academy)
+
 
 
 ## Description
